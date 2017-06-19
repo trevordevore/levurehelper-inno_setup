@@ -5,8 +5,8 @@ Inno Setup is a free installer system for Windows available at (http://www.jrsof
 ## Contents
 
 * [Activate the inno_setup framework helper](#activate-the-inno_setup-framework-helper)
-* [Generating an .iss file when packagin your application](#generating-an-.iss-file-when-packagin-your-application)
-* [Setting up the `.iss` file](#setting-up-the-`.iss`-file)
+* [Generating an .iss file when packaging your application](#generating-an-iss-file-when-packaging-your-application)
+* [Setting up the `.iss` file](#setting-up-the-iss-file)
 
 ## Activate the inno_setup framework helper
 
@@ -20,7 +20,7 @@ helpers:
   - filename: "./helpers/inno_setup"
 ```
 
-## Generating an .iss file when packagin your application
+## Generating an .iss file when packaging your application
 
 The Inno Setup helper works by inserting references to all of the files and folders in the root directory of your application folder into an existing `.iss` file. The helper will replace the variable `[[FilesAndFoldersToInstall]]` with the file and folder references.
 
