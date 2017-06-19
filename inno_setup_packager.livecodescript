@@ -52,11 +52,10 @@ private function _flagsForFilename pConfigA, pFilename, pIsFolder
       put "Flags: " & pConfigA["folder flags"] into tFlags
     end if
   else
-    if pConfigA["file flags"] is not empty then
+    if pFilename ends with ".exe" and pConfigA["executable flags"] is not empty then
+      put "Flags: " & pConfigA["executable flags"] into tFlags
+    else if pConfigA["file flags"] is not empty then
       put "Flags: " & pConfigA["file flags"] into tFlags
-      if pFilename ends with ".exe" and pConfigA["executable flags"] is not empty then
-        put " " & pConfigA["executable flags"] after tFlags
-      end if
     end if
   end if
 
