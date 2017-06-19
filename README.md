@@ -95,7 +95,18 @@ build profiles:
 When setting up the `.iss` file that the Inno Setup helper will use you will configure every setting except for your application files in the `[Files]` section. In the `[Files]` section you will include the string `[[FilesAndFoldersToInstall]]` on a line by itself:
 
 ```
+...
+[Setup]
+SignTool=signtool
+AppName=MyApp
+AppVerName=MyApp 1.0
+...
+
 [Files]
 
 [[FilesAndFoldersToInstall]]
+
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags:
+...
 ```
