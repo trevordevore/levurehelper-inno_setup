@@ -4,7 +4,7 @@ script "Inno Setup Packager"
   - Reads in entries from `inno setup` key.
   -
 */
-command processCopyFilesFile @pFiledata, pOutputFolder
+command processCopyFilesFile @pFiledata, pOutputFolder, pBuildProfile
   local tConfigA, tFolders, tFiles, tFilename, tFlags, tInstallerFiles
 
   _replaceVariables pFiledata, pOutputFolder
