@@ -48,7 +48,15 @@ end processCopyFilesFile
 
 
 private command _replaceVariables @xFileData, pBuildProfile
-  replace textEncode("[[VERSION]]", "utf8") with levureAppGet("version") in xFileData
+  local tVersion
+
+  put levureAppGet("version") into tVersion
+  set the itemDelimiter to "."
+
+  replace textEncode("[[NAME]]", "utf8") with levureAppGet("name") in xFileData
+  replace textEncode("[[VERSION]]", "utf8") with tVersion in xFileData
+  replace textEncode("[[MAJOR_VERSION]]", "utf8") with item 1 of tVersion in xFileData
+  replace textEncode("[[APP_VERSION]]", "utf8") with item 1 to 2 of tVersion in xFileData
   replace textEncode("[[BUILD]]", "utf8") with levureAppGet("build") in xFileData
   replace textEncode("[[BUILD_PROFILE]]", "utf8") with tolower(pBuildProfile) in xFileData
 end _replaceVariables
