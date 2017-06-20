@@ -1,6 +1,6 @@
 # inno_setup
 
-Inno Setup is a free installer system for Windows available at (http://www.jrsoftware.org/isinfo.php). This helper fills in a template `.iss` file with the files and folders in your application each time you package your application.
+Inno Setup is a free installer system for Windows available at http://www.jrsoftware.org/isinfo.php. This helper fills in a template `.iss` file with the files and folders in your application each time you package your application.
 
 ## Contents
 
@@ -92,14 +92,23 @@ build profiles:
 
 ## Setting up the `.iss` file
 
-When setting up the `.iss` file that the Inno Setup helper will use you will configure every setting except for your application files in the `[Files]` section. In the `[Files]` section you will include the string `[[FilesAndFoldersToInstall]]` on a line by itself:
+When setting up the `.iss` file that the Inno Setup helper will use you will configure every setting except for your application files in the `[Files]` section. In the `[Files]` section you will include the string `[[FilesAndFoldersToInstall]]` on a line by itself. There are some other variables you can use in the file as well.
+
+`[[NAME]]`: The `name` property from `app.yml`.
+`[[APP_VERSION]]`: The first two numbers from `version` in `app.yml` (e.g. 2.0).
+`[[MAJOR_VERSION]]`: The first number from the `version` property in `app.yml` (e.g. 2).
+`[[BUILD]]`: The `build` property from `app.yml`.
+`[[BUILD_PROFILE]]`: The build profile used to package the application.
+
+
+### Example:
 
 ```
 ...
 [Setup]
 SignTool=signtool
-AppName=MyApp
-AppVerName=MyApp 1.0
+AppName=[[NAME]]
+AppVerName=[[NAME]] [[APP_VERSION]]
 ...
 
 [Files]
