@@ -3,6 +3,6 @@ register components:
   - key: inno setup
     kind: copy files
     target platform: package folder
-    callback stack: inno_setup_packager.livecodescript
+    callback stackfile: inno_setup_packager.livecodescript
 # Don't include when packaging an application
 distribute: false
