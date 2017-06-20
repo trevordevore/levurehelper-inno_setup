@@ -1,9 +1,4 @@
 script "Inno Setup Packager"
-/*
-  - Notified when packaging up an application.
-  - Reads in entries from `inno setup` key.
-  -
-*/
 command processCopyFilesFile @pFiledata, pOutputFolder, pBuildProfile
   local tConfigA, tFolders, tFiles, tFilename, tFlags, tInstallerFiles
 
