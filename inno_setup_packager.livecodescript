@@ -4,8 +4,10 @@ script "Inno Setup Packager"
   - Reads in entries from `inno setup` key.
   -
 */
-command processCopyFilesFile pOutputFolder, @pFiledata
+command processCopyFilesFile @pFiledata, pOutputFolder
   local tConfigA, tFolders, tFiles, tFilename, tFlags, tInstallerFiles
+
+  _replaceVariables pFiledata, pOutputFolder
 
   if levureAppHasProperty("inno setup") then
     put levureAppGet("inno setup") into tConfigA
@@ -18,6 +20,12 @@ command processCopyFilesFile pOutputFolder, @pFiledata
   filter tFolders without "..*"
   filter tFiles without ".*"
 
+  /*
+  Examples:
+  Source: ".\windows\MyApp.exe"; DestDir: "{app}"; Flags: ignoreversion sign
+  Source: ".\windows\levure.livecodescript"; DestDir: "{app}"; Flags: ignoreversion
+  Source: ".\windows\helpers\*"; DestDir: "{app}\helpers"; Flags: ignoreversion recursesubdirs createallsubdirs
+  */
   repeat for each line tFilename in tFolders
     put _q("Source: `.\windows\" & tFilename & "\*`; DestDir: `{app}" & "\" & tFilename & "`;") after tInstallerFiles
 
@@ -44,6 +52,13 @@ command processCopyFilesFile pOutputFolder, @pFiledata
 end processCopyFilesFile
 
 
+private command _replaceVariables @xFileData, pBuildProfile
+  replace textEncode("[[VERSION]]", "utf8") with levureAppGet("version") in xFileData
+  replace textEncode("[[BUILD]]", "utf8") with levureAppGet("build") in xFileData
+  replace textEncode("[[BUILD_PROFILE]]", "utf8") with tolower(pBuildProfile) in xFileData
+end _replaceVariables
+
+
 private function _flagsForFilename pConfigA, pFilename, pIsFolder
   local tFlags
 
@@ -67,20 +82,3 @@ private function _q pStr
   replace "`" with quote in pStr
   return pStr
 end _q
-
-/*
-Source: ".\Windows\ScreenSteps.exe"; DestDir: "{app}"; Flags: ignoreversion sign
-Source: ".\Windows\revsecurity.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Windows\prefs.yml"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Windows\app.livecodescript"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Windows\behaviors.livecode"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Windows\frontscripts.livecode"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Windows\levure.livecodescript"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Windows\libraries.livecode"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Windows\Externals\CEF\*"; DestDir: "{app}\Externals\CEF"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ".\Windows\helpers\*"; DestDir: "{app}\helpers"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ".\Windows\locales\*"; DestDir: "{app}\locales"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ".\Windows\resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ".\Windows\templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: ".\Windows\ui\*"; DestDir: "{app}\ui"; Flags: ignoreversion recursesubdirs createallsubdirs
-*/
