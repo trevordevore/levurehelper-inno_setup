@@ -1,5 +1,6 @@
 script "Inno Setup Packager"
 local sScriptsToCompile
+local sWineCmd, sWinePathCmd
 
 command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFilename, pFileSettingsA
   local tConfigA, tFolders, tFiles, tFilename, tFlags, tInstallerFiles
@@ -59,32 +60,83 @@ command postPackagForBuildProfile pBuildProfile, pOutputFolder
   put sScriptsToCompile into tScriptsToCompile
   put empty into sScriptsToCompile
 
-  if the platform is not "win32" then return empty
+  if the platform is "win32" or _isWineInstalled() then
+    local tSettingsA, tCompilerPath
 
-  local tSettingsA, tProfilesA, tName, tMacAppBundleFolder
+    if levureAppHasProperty("inno setup") then
+      put levureAppGet("inno setup") into tSettingsA
+    end if
 
-  if levureAppHasProperty("inno setup") then
-    put levureAppGet("inno setup") into tSettingsA
+    if the platform is "win32" then
+      put tSettingsA["windows compiler"] into tCompilerPath
+    else
+      put tSettingsA["wine compiler"] into tCompilerPath
+    end if
+
+    if tCompilerPath is empty then return empty
+
+    local tCmd, tResult, tReturnVal
+
+    repeat for each line tScript in tScriptsToCompile
+      # compil32 /cc "c:\isetup\samples\my script.iss"
+      if the platform is "win32" then
+        replace "/" with "\" in tScript
+        put format("\"%s\" /cc \"%s\"", tCompilerPath, tScript) into tCmd
+        put shell(tCmd) into tResult
+        put the result into tReturnVal
+      else
+        local tWineFilepath
+
+        put format("\"%s\" -w \"%s\"", sWinePathCmd, tScript) into tCmd
+        put line 1 of shell(tCmd) into tWineFilepath
+        put the result into tReturnVal
+
+        if tReturnVal is empty then
+          put format("\"%s\" \"%s\" /cc \"%s\"", sWineCmd, tCompilerPath, tWineFilepath) into tCmd
+          put shell(tCmd) into tResult
+          put the result into tReturnVal
+        end if
+      end if
+
+      if tReturnVal is 1 then
+        put "inno setup result:" && tResult & cr & "for command:" && tCmd
+        answer error param(0) && "invalid parameters passed to inno setup command line tool"
+        exit repeat
+      else if tReturnVal is not empty then
+        put "inno setup result:" && tResult & cr & "for command:" && tCmd
+        answer error param(0) && "inno setup compile failed" && tReturnVal
+        exit repeat
+      end if
+    end repeat
+  end if
+end postPackagForBuildProfile
+
+
+private function _isWineInstalled
+  if the platform is not "macos" then return false
+
+  local tResult, tReturnVal
+
+  put "wine" into sWineCmd
+  put shell(sWineCmd && "--version") into tResult
+  put the result into tReturnVal
+
+  if tReturnVal is not empty then
+    put "/usr/local/bin/wine" into sWineCmd
+    put shell(sWineCmd && "--version") into tResult
+    put the result into tReturnVal
   end if
 
-  if tSettingsA["compiler"] is empty then return empty
-
-  local tCmd, tResult
-
-  repeat for each line tScript in tScriptsToCompile
-    # compil32 /cc "c:\isetup\samples\my script.iss"
-    put format("\"%s\" /cc \"%s\"", \
-        tSettingsA["compiler"], tScript) into tCmd
-    put shell(tCmd) into tResult
-    if tResult is 1 then
-      put "inno setup result:" && the result
-      answer error param(0) && "invalid parameters passed to inno setup command line tool"
-    else if tResult is 2 then
-      put "inno setup result:" && the result
-      answer error param(0) && "inno setup compile failed"
-    end if
-  end repeat
-end postPackagForBuildProfile
+  if tReturnVal is not empty then
+    put empty into sWineCmd
+    return false
+  else
+    set the itemDelimiter to "/"
+    put sWineCmd into sWinePathCmd
+    put "winepath" into the last item of sWinePathCmd
+    return true
+  end if
+end _isWineInstalled
 
 
 private command _replaceVariables @xFileData, pBuildProfile

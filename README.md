@@ -122,3 +122,23 @@ AppVerName=[[NAME]] [[APP_VERSION]]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags:
 ...
 ```
+
+## Installing Wine on OS X
+
+The helper will try to detect if Wine is installed on non-Windows computers. If Wine is installed and the `wine compiler` property is set then the helper will try to compile the scripts. For instructions on installing Wine on OS X see the following url:
+
+https://www.davidbaumgold.com/tutorials/wine-mac/
+
+
+## TODO
+
+It should be possible to do the following so that the path to the Wine compiler doesn't have to be entered in the `app.yml` file:
+
+1. Detect if Wine is installed
+2. Determine the Program Files directory
+3. Determine if Inno Setup is installed
+4. Run the command.
+
+The following url has a gist has a script that does just that:
+
+https://gist.github.com/derekstavis/8288379
