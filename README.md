@@ -37,9 +37,10 @@ inno setup:
   file flags:
   folder flags:
   executable flags:
+  compiler:
 ```
 
-The `file flags`, `folder flags`, and `executable flags` properties specify the flags that will be added to the file and folder entries in the `.iss` file.
+The `file flags`, `folder flags`, and `executable flags` properties specify the flags that will be added to the file and folder entries in the `.iss` file. The `compiler` property is set to the path to Inno Setup command line compiler. When running on Windows the helper will try to compile the `.iss` script.
 
 `file flags`: Flags that will be added to all files added to the `.iss` file.
 `folder flags`: Flags that will be added to all folders added to the `.iss` file.
@@ -54,6 +55,7 @@ inno setup:
   file flags: ignoreversion
   folder flags: ignoreversion recursesubdirs createallsubdirs
   executable flags: ignorevesion sign
+  compiler: C:\Program Files (x86)\Inno Setup 5\Compil32.exe
 ```
 
 ```
@@ -77,7 +79,7 @@ Source: ".\windows\ScreenSteps.exe"; DestDir: "{app}"; Flags: ignoreversion sign
 
 ### `copy files` section
 
-The second location you will be in one or more `copy files` sections under `build profiles`. You will add an `inno setup` section with references to the `.iss` file(s) that you want to copy over into the package folder when you package an application. Here is an example that copies the `./build files/MyApp.iss` file for all build profiles.
+The second location you will be in one or more `copy files` sections under `build profiles`. You will add an `inno setup` section with references to the `.iss` file(s) that you want to copy over into the package folder when you package an application. Here is an example that copies the `./build files/MyApp.iss` file for all build profiles. Note the optional `compile` parameter. Set to `false` if the helper should not try to compile the script.
 
 ```
 # app.yml
@@ -88,6 +90,7 @@ build profiles:
     copy files:
       inno setup:
         - filename: ../build files/MyApp.iss
+          compile: true
 ```
 
 ## Setting up the `.iss` file
