@@ -40,7 +40,7 @@ inno setup:
   compiler:
 ```
 
-The `file flags`, `folder flags`, and `executable flags` properties specify the flags that will be added to the file and folder entries in the `.iss` file. The `compiler` property is set to the path to Inno Setup command line compiler. When running on Windows the helper will try to compile the `.iss` script.
+The `file flags`, `folder flags`, and `executable flags` properties specify the flags that will be added to the file and folder entries in the `.iss` file. The `compiler` property is set to the path to Inno Setup `Compil32.exe` compiler. When running on Windows the helper will try to compile the `.iss` script.
 
 `file flags`: Flags that will be added to all files added to the `.iss` file.
 `folder flags`: Flags that will be added to all folders added to the `.iss` file.
