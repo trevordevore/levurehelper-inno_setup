@@ -40,11 +40,13 @@ inno setup:
   compiler:
 ```
 
-The `file flags`, `folder flags`, and `executable flags` properties specify the flags that will be added to the file and folder entries in the `.iss` file. The `compiler` property is set to the path to Inno Setup `Compil32.exe` compiler. When running on Windows the helper will try to compile the `.iss` script.
+The `file flags`, `folder flags`, and `executable flags` properties specify the flags that will be added to the file and folder entries in the `.iss` file. The `windows compiler` property is set to the path to Inno Setup `Compil32.exe` compiler. When running on Windows the helper will try to compile the `.iss` script.
 
 `file flags`: Flags that will be added to all files added to the `.iss` file.
 `folder flags`: Flags that will be added to all folders added to the `.iss` file.
 `executable flags`: Flags that will be added to the executable file that is added to the `.iss` file.
+`windows compiler`: Windows path to the Inno Setup `Compil32.exe` file.
+`wine compiler`: Wine path to the Inno Setup `Compile32.exe` file.
 
 Here is an example:
 
@@ -55,7 +57,8 @@ inno setup:
   file flags: ignoreversion
   folder flags: ignoreversion recursesubdirs createallsubdirs
   executable flags: ignorevesion sign
-  compiler: C:\Program Files (x86)\Inno Setup 5\Compil32.exe
+  windows compiler: C:\Program Files (x86)\Inno Setup 5\Compil32.exe
+  wine compiler: wine compiler: /Users/myusername/.wine/drive_c/Program Files/Inno Setup 5/Compil32.exe
 ```
 
 ```
@@ -131,6 +134,12 @@ https://www.davidbaumgold.com/tutorials/wine-mac/
 
 
 ## TODO
+
+### Use SignTool feature with Wine
+
+You can define a SignTool to use with Inno Setup. This allows you to sign files added to the installer as well as the uninstaller and installer that are created. When running under windows you can use the `signtool.exe` executable that comes with the Windows SDK. This executable doesn't appear to work under Wine, however.
+
+### Automate Wine
 
 It should be possible to do the following so that the path to the Wine compiler doesn't have to be entered in the `app.yml` file:
 
