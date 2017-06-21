@@ -4,5 +4,6 @@ register components:
     kind: copy files
     target platform: package folder
     callback stackfile: inno_setup_packager.livecodescript
+packager callbacks stackfile: inno_setup_packager.livecodescript
 # Don't include when packaging an application
 distribute: false
