@@ -1,8 +1,10 @@
 script "Inno Setup Packager"
-command processCopyFilesFile @pFiledata, pOutputFolder, pBuildProfile
+local sScriptsToCompile
+
+command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFilename, pFileSettingsA
   local tConfigA, tFolders, tFiles, tFilename, tFlags, tInstallerFiles
 
-  _replaceVariables pFiledata, pOutputFolder
+  _replaceVariables xFiledata, pOutputFolder
 
   if levureAppHasProperty("inno setup") then
     put levureAppGet("inno setup") into tConfigA
@@ -43,8 +45,46 @@ command processCopyFilesFile @pFiledata, pOutputFolder, pBuildProfile
 
   delete the last char of tInstallerFiles
 
-  replace "[[FilesAndFoldersToInstall]]" with tInstallerFiles in pFiledata
+  replace "[[FilesAndFoldersToInstall]]" with tInstallerFiles in xFiledata
+
+  if pFileSettingsA["compile"] is not false then
+    put pOutputFolder & "/" & pOutputFilename into line (the number of lines of sScriptsToCompile + 1) of sScriptsToCompile
+  end if
 end processCopyFilesFile
+
+
+command postPackagForBuildProfile pBuildProfile, pOutputFolder
+  local tScriptsToCompile
+
+  put sScriptsToCompile into tScriptsToCompile
+  put empty into sScriptsToCompile
+
+  if the platform is not "win32" then return empty
+
+  local tSettingsA, tProfilesA, tName, tMacAppBundleFolder
+
+  if levureAppHasProperty("inno setup") then
+    put levureAppGet("inno setup") into tSettingsA
+  end if
+
+  if tSettingsA["compiler"] is empty then return empty
+
+  local tCmd, tResult
+
+  repeat for each line tScript in tScriptsToCompile
+    # compil32 /cc "c:\isetup\samples\my script.iss"
+    put format("\"%s\" /cc \"%s\"", \
+        tSettingsA["compiler"], tScript) into tCmd
+    put shell(tCmd) into tResult
+    if tResult is 1 then
+      put "inno setup result:" && the result
+      answer error param(0) && "invalid parameters passed to inno setup command line tool"
+    else if tResult is 2 then
+      put "inno setup result:" && the result
+      answer error param(0) && "inno setup compile failed"
+    end if
+  end repeat
+end postPackagForBuildProfile
 
 
 private command _replaceVariables @xFileData, pBuildProfile
