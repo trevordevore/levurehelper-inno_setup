@@ -11,9 +11,9 @@ AppPublisher=Your Company
 AppPublisherURL=http://www.mydomain.com
 AppSupportURL=http://help.mydomain.com
 AppVersion=[[APP_VERSION]]
-DefaultDirName={code:ProgramFolder}\[[[NAME]] [[MAJOR_VERSION]]
-DefaultGroupName=[[[NAME]] [[MAJOR_VERSION]]
-UninstallDisplayIcon={app}\[[[NAME]].exe
+DefaultDirName={pf}\[[NAME]] [[MAJOR_VERSION]]
+DefaultGroupName=[[NAME]] [[MAJOR_VERSION]]
+UninstallDisplayIcon={app}\[[NAME]].exe
 Compression=lzma
 SolidCompression=yes
 OutputDir=.\
@@ -48,6 +48,9 @@ ChangesAssociations=yes
 ;Type: filesandordirs; Name: "{userappdata}\[[NAME]]\[[APP_VERSION]]"
 
 [Dirs]
+
+[[DirectoriesToCreate]]
+
 ; Uncomment this example if your application stores information in the user data folder and a folder should be created.
 ;Name: "{userappdata}\[[NAME]]";
 

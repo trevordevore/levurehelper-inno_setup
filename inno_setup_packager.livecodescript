@@ -3,7 +3,7 @@ local sScriptsToCompile
 local sWineCmd, sWinePathCmd
 
 command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFilename, pFileSettingsA
-  local tConfigA, tFolders, tFiles, tFilename, tFlags, tInstallerFiles
+  local tConfigA, tFolders, tFiles, tFilename, tFlags, tInstallerFiles, tDirFiles
 
   _replaceVariables xFiledata, pOutputFolder
 
@@ -11,12 +11,8 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
     put levureAppGet("inno setup") into tConfigA
   end if
 
-  put folders(pOutputFolder & "/windows") into tFolders
-  put files(pOutputFolder & "/windows") into tFiles
-
-  filter tFolders without ".*"
-  filter tFolders without "..*"
-  filter tFiles without ".*"
+  put foldersInFolder(pOutputFolder & "/windows") into tFolders
+  put filesInFolder(pOutputFolder & "/windows") into tFiles
 
   /*
   Examples:
@@ -25,13 +21,17 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
   Source: ".\windows\helpers\*"; DestDir: "{app}\helpers"; Flags: ignoreversion recursesubdirs createallsubdirs
   */
   repeat for each line tFilename in tFolders
-    put _q("Source: `.\windows\" & tFilename & "\*`; DestDir: `{app}" & "\" & tFilename & "`;") after tInstallerFiles
+    if filesInFolder(pOutputFolder & "/windows/" & tFilename) is empty and foldersInFolder(pOutputFolder & "/windows/" & tFilename) is empty then
+      put _q("Name: `{app}\" & tFilename & "`") & cr after tDirFiles
+    else
+      put _q("Source: `.\windows\" & tFilename & "\*`; DestDir: `{app}" & "\" & tFilename & "`;") after tInstallerFiles
 
-    put _flagsForFilename(tConfigA, tFilename, true) into tFlags
-    if tFlags is not empty then
-      put space & tFlags after tInstallerFiles
+      put _flagsForFilename(tConfigA, tFilename, true) into tFlags
+      if tFlags is not empty then
+        put space & tFlags after tInstallerFiles
+      end if
+      put cr after tInstallerFiles
     end if
-    put cr after tInstallerFiles
   end repeat
 
   repeat for each line tFilename in tFiles
@@ -45,13 +45,34 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
   end repeat
 
   delete the last char of tInstallerFiles
+  delete the last char of tDirFiles
 
   replace "[[FilesAndFoldersToInstall]]" with tInstallerFiles in xFiledata
+  replace "[[DirectoriesToCreate]]" with tDirFiles in xFiledata
 
   if pFileSettingsA["compile"] is not false then
     put pOutputFolder & "/" & pOutputFilename into line (the number of lines of sScriptsToCompile + 1) of sScriptsToCompile
   end if
 end processCopyFilesFile
+
+
+private function filesInFolder pFolder
+  local tFiles
+
+  put files(pFolder) into tFiles
+  filter tFiles without ".*"
+  return tFiles
+end filesInFolder
+
+
+private function foldersInFolder pFolder
+  local tFolders
+
+  put folders(pFolder) into tFolders
+  filter tFolders without ".*"
+  filter tFolders without "..*"
+  return tFolders
+end foldersInFolder
 
 
 command postPackagForBuildProfile pBuildProfile, pOutputFolder

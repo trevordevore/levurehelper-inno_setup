@@ -18,7 +18,7 @@ Click on the green **Clone or download** button on the GitHub page and select **
 
 ## Generating an .iss file when packaging your application
 
-The Inno Setup helper works by inserting references to all of the files and folders in the root directory of your application folder into an existing `.iss` file. The helper will replace the variable `[[FilesAndFoldersToInstall]]` with the file and folder references.
+The Inno Setup helper works by inserting references to all of the files and folders in the root directory of your application folder into an existing `.iss` file. The helper will replace the variable `[[FilesAndFoldersToInstall]]` with the file and folder references. If your application contains any root level folders that are empty then they will be used to replace the `[[DirectoriesToCreate]]` variable in the `[Dir]` section of the `.iss` file.
 
 You will add configuration information to two locations within the `app.yml` file.
 
@@ -116,6 +116,10 @@ AppVerName=[[NAME]] [[APP_VERSION]]
 [Files]
 
 [[FilesAndFoldersToInstall]]
+
+[Dir]
+
+[[DirectoriesToCreate]]
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags:
