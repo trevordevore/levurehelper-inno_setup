@@ -12,15 +12,9 @@ If you run this helper on Windows then it can be configured to automatically com
 
 ## Activate the inno_setup framework helper
 
-To add the Inno Setup helper to your application add it under the `helpers` section of the `app.yml` file:
+To add the inno_setup helper to your application you must download it and add the `inno_setup` folder to your application `helpers` folder.
 
-```
-# app.yml
-
-helpers:
-  - folder: ./helpers
-  - filename: "./helpers/inno_setup"
-```
+Click on the green **Clone or download** button on the GitHub page and select **Download ZIP** from the menu that appears. Grab the `inno_setup` folder from the archive and add it to your application `helpers` folder.
 
 ## Generating an .iss file when packaging your application
 
