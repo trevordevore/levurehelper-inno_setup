@@ -1,6 +1,8 @@
 # inno_setup
 
-Inno Setup is a free installer system for Windows available at http://www.jrsoftware.org/isinfo.php. This helper fills in a template `.iss` file with the files and folders in your application each time you package your application.
+Inno Setup is a free installer system for Windows available at http://www.jrsoftware.org/isinfo.php. This helper fills in a template `.iss` file with the files and folders in your application each time you package your application. The resulting file is placed in the package folder alongside the `windows` folder.
+
+If you run this helper on Windows then it can be configured to automatically compile the resulting `.iss` file using a local installation of Inno Setup. If you are running it on macOS or Linux then Wine can be used to compile the `.iss` file. If you are using Wine you will not be able to sign the installer using the Inno Setup SignTool setting, however.
 
 ## Contents
 
