@@ -75,7 +75,7 @@ private function foldersInFolder pFolder
 end foldersInFolder
 
 
-command postPackagForBuildProfile pBuildProfile, pOutputFolder
+command packagingComplete pBuildProfile, pOutputFolder
   local tScriptsToCompile
 
   put sScriptsToCompile into tScriptsToCompile
@@ -130,7 +130,7 @@ command postPackagForBuildProfile pBuildProfile, pOutputFolder
       end if
     end repeat
   end if
-end postPackagForBuildProfile
+end packagingComplete
 
 
 private function _isWineInstalled
