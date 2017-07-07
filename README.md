@@ -14,7 +14,7 @@ If you run this helper on Windows then it can be configured to automatically com
 
 To add the inno_setup helper to your application you must download it and add the `inno_setup` folder to your application `helpers` folder.
 
-Click on the green **Clone or download** button on the GitHub page and select **Download ZIP** from the menu that appears. Grab the `inno_setup` folder from the archive and add it to your application `helpers` folder.
+Click on the green **Clone or download** button on the GitHub page and select **Download ZIP** from the menu that appears. Grab the folder from the archive and rename it to `inno_setup`. Add the renamed folder to your application `helpers` folder.
 
 ## Generating an .iss file when packaging your application
 
