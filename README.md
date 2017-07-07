@@ -6,11 +6,11 @@ If you run this helper on Windows then it can be configured to automatically com
 
 ## Contents
 
-* [Activate the inno_setup framework helper](#activate-the-inno_setup-framework-helper)
+* [Activate the inno_setup helper](#activate-the-inno_setup-helper)
 * [Generating an .iss file when packaging your application](#generating-an-iss-file-when-packaging-your-application)
 * [Setting up the `.iss` file](#setting-up-the-iss-file)
 
-## Activate the inno_setup framework helper
+## Activate the inno_setup helper
 
 To add the inno_setup helper to your application you must download it and add the `inno_setup` folder to your application `helpers` folder.
 
