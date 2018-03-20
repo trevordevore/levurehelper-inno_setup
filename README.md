@@ -53,9 +53,9 @@ Here is an example:
 inno setup:
   file flags: ignoreversion
   folder flags: ignoreversion recursesubdirs createallsubdirs
-  executable flags: ignorevesion sign
+  executable flags: ignoreversion sign
   windows compiler: C:\Program Files (x86)\Inno Setup 5\Compil32.exe
-  wine compiler: wine compiler: /Users/myusername/.wine/drive_c/Program Files/Inno Setup 5/Compil32.exe
+  wine compiler: /Users/myusername/.wine/drive_c/Program Files/Inno Setup 5/Compil32.exe
 ```
 
 ```
