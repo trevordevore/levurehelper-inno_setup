@@ -5,7 +5,7 @@ local sWineCmd, sWinePathCmd
 command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFilename, pFileSettingsA
   local tConfigA, tFolders, tFiles, tFilename, tFlags, tInstallerFiles, tDirFiles
 
-  _replaceVariables xFiledata, pOutputFolder
+  _replaceVariables xFiledata, pBuildProfile
 
   if levureAppHasProperty("inno setup") then
     put levureAppGet("inno setup") into tConfigA
