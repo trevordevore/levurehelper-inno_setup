@@ -161,7 +161,7 @@ end _isWineInstalled
 
 
 private command _replaceVariables @xFileData, pBuildProfile
-  local tVersion
+  local tVersion, tConfigA
 
   put levureAppGet("version") into tVersion
   set the itemDelimiter to "."
@@ -172,6 +172,23 @@ private command _replaceVariables @xFileData, pBuildProfile
   replace textEncode("[[APP_VERSION]]", "utf8") with item 1 to 2 of tVersion in xFileData
   replace textEncode("[[BUILD]]", "utf8") with levureAppGet("build") in xFileData
   replace textEncode("[[BUILD_PROFILE]]", "utf8") with tolower(pBuildProfile) in xFileData
+
+  local tInstallerName
+
+  put levureAppGet("build profiles") into tConfigA
+
+  put tConfigA[pBuildProfile]["installer name"]["windows"] into tInstallerName
+  if tInstallerName is empty then
+    put tConfigA["all profiles"]["installer name"]["windows"] into tInstallerName
+  end if
+  if tInstallerName is empty then
+    put tConfigA[pBuildProfile]["installer name"]["all platforms"] into tInstallerName
+  end if
+  if tInstallerName is empty then
+    put tConfigA["all profiles"]["installer name"]["all platforms"] into tInstallerName
+  end if
+
+  replace textEncode("[[INSTALLER_NAME]]", "utf8") with tInstallerName in xFileData
 end _replaceVariables
 
 
