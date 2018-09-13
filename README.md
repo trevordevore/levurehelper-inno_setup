@@ -135,6 +135,7 @@ When setting up the `.iss` file that the Inno Setup helper will use you will con
 SignTool=signtool
 AppName=[[NAME]]
 AppVerName=[[NAME]] [[APP_VERSION]]
+OutputBaseFilename=[[INSTALLER_NAME]] [[VERSION]]-[[BUILD]]
 ...
 
 [Files]
