@@ -97,7 +97,7 @@ build profiles:
   ...
 ```
 
-Note that `installer name` is a generic name intended to be shared by other helpers that create installers. For example, the dropDMG helper uses `installer name` as well. If you want to use a different name for `Windows` then use the `windows` key rather than the `all platforms` key.
+Note that `installer name` is a generic name intended to be shared by other helpers that create installers. For example, the Auto Updater helper uses `installer name` as does the dropDMG helper. If you want to use a different name for `Windows` then use the `windows` key rather than the `all platforms` key.
 
 ### `copy files` section
 
