@@ -77,6 +77,28 @@ Source: ".\windows\ScreenSteps.exe"; DestDir: "{app}"; Flags: ignoreversion sign
 ...
 ```
 
+## Specifying the installer name
+
+You can configure a name for the installer that can then be inserted into the .iss file using the `[[INSTALLER_NAME]]` variable. The following example shows how to configure different installer names for `release` and for `beta`.
+
+```
+# app.yml
+
+build profiles:
+  ...
+  release:
+    installer name:
+      # Name to use for the DMG that will be created
+      all platforms: My App
+  beta:
+    installer name:
+      # Name to use for the DMG that will be created
+      all platforms: My App Beta
+  ...
+```
+
+Note that `installer name` is a generic name intended to be shared by other helpers that create installers. For example, the dropDMG helper uses `installer name` as well. If you want to use a different name for `Windows` then use the `windows` key rather than the `all platforms` key.
+
 ### `copy files` section
 
 The second location you will be in one or more `copy files` sections under `build profiles`. You will add an `inno setup` section with references to the `.iss` file(s) that you want to copy over into the package folder when you package an application. Here is an example that copies the `./build files/MyApp.iss` file for all build profiles. Note the optional `compile` parameter. Set to `false` if the helper should not try to compile the script.
@@ -98,6 +120,7 @@ build profiles:
 When setting up the `.iss` file that the Inno Setup helper will use you will configure every setting except for your application files in the `[Files]` section. In the `[Files]` section you will include the string `[[FilesAndFoldersToInstall]]` on a line by itself. There are some other variables you can use in the file as well.
 
 `[[NAME]]`: The `name` property from `app.yml`.
+`[[INSTALLER_NAME]]`: The `installer name` property from `app.yml`.
 `[[APP_VERSION]]`: The first two numbers from `version` in `app.yml` (e.g. 2.0).
 `[[MAJOR_VERSION]]`: The first number from the `version` property in `app.yml` (e.g. 2).
 `[[BUILD]]`: The `build` property from `app.yml`.
