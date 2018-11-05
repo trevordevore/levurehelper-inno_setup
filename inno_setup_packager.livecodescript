@@ -7,9 +7,7 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
 
   _replaceVariables xFiledata, pBuildProfile
 
-  if levureAppHasProperty("inno setup") then
-    put levureAppGet("inno setup") into tConfigA
-  end if
+  put levureAppGet("inno setup") into tConfigA
 
   put foldersInFolder(pOutputFolder & "/windows") into tFolders
   put filesInFolder(pOutputFolder & "/windows") into tFiles
@@ -84,9 +82,7 @@ command packagingComplete pBuildProfile, pOutputFolder
   if the platform is "win32" or _isWineInstalled() then
     local tSettingsA, tCompilerPath
 
-    if levureAppHasProperty("inno setup") then
-      put levureAppGet("inno setup") into tSettingsA
-    end if
+    put levureAppGet("inno setup") into tSettingsA
 
     if the platform is "win32" then
       put tSettingsA["windows compiler"] into tCompilerPath
