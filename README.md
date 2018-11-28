@@ -37,15 +37,26 @@ inno setup:
   wine compiler:
 ```
 
-The `file flags`, `folder flags`, and `executable flags` properties specify the flags that will be added to the file and folder entries in the `.iss` file. The `windows compiler` property is set to the path to Inno Setup `Compil32.exe` compiler. When running on Windows the helper will try to compile the `.iss` script.
+The `file flags`, `folder flags`, and `executable flags` properties specify the
+flags that will be added to the file and folder entries in the `.iss` file. The 
+`windows compiler` property is set to the path to Inno Setup `Compil32.exe` or
+`ISCC.exe` compiler. Use `Compil32.exe` to see a the script being compiled in a
+dialog. When running on Windows or when wine is installed the helper will try to
+compile the `.iss` script.
 
 `file flags`: Flags that will be added to all files added to the `.iss` file.
 `folder flags`: Flags that will be added to all folders added to the `.iss` file.
 `executable flags`: Flags that will be added to the executable file that is added to the `.iss` file.
 `windows compiler`: Windows path to the Inno Setup `Compil32.exe` file.
-`wine compiler`: Wine path to the Inno Setup `Compile32.exe` file.
+`wine compiler`: Wine path to the Inno Setup `Compil32.exe` file.
+`compiler`: If using the same compiler under both windows or wine then this
+property may be used instead of `windows compiler` and `wine compiler`.
 
-Here is an example:
+If any of the paths to the compilers are not found an attempt will be made to
+find the compiler in the Inno Setup folder with the highest version number inside
+the x86 program files directory.
+
+Here is an example using separate full paths to the compilers:
 
 ```
 # app.yml
@@ -56,6 +67,18 @@ inno setup:
   executable flags: ignoreversion sign
   windows compiler: C:\Program Files (x86)\Inno Setup 5\Compil32.exe
   wine compiler: /Users/myusername/.wine/drive_c/Program Files/Inno Setup 5/Compil32.exe
+```
+
+Here is an example specifying a compiler to be found:
+
+```
+# app.yml
+
+inno setup:
+  file flags: ignoreversion
+  folder flags: ignoreversion recursesubdirs createallsubdirs
+  executable flags: ignoreversion sign
+  compiler: ISCC.exe
 ```
 
 ```
@@ -163,16 +186,3 @@ https://www.davidbaumgold.com/tutorials/wine-mac/
 ### Use SignTool feature with Wine
 
 You can define a SignTool to use with Inno Setup. This allows you to sign files added to the installer as well as the uninstaller and installer that are created. When running under windows you can use the `signtool.exe` executable that comes with the Windows SDK. This executable doesn't appear to work under Wine, however.
-
-### Automate Wine
-
-It should be possible to do the following so that the path to the Wine compiler doesn't have to be entered in the `app.yml` file:
-
-1. Detect if Wine is installed
-2. Determine the Program Files directory
-3. Determine if Inno Setup is installed
-4. Run the command.
-
-The following url has a gist has a script that does just that:
-
-https://gist.github.com/derekstavis/8288379
