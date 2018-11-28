@@ -104,7 +104,7 @@ command packagingComplete pBuildProfile, pOutputFolder
       else
         local tWineFilepath
 
-        put format("\"%s\" -w \"%s\"", sWinePathCmd, tScript) into tCmd
+        put format("\"%s\" -w \"%s\" 2> /dev/null", sWinePathCmd, tScript) into tCmd
         put line 1 of shell(tCmd) into tWineFilepath
         put the result into tReturnVal
 
@@ -135,12 +135,12 @@ private function _isWineInstalled
   local tResult, tReturnVal
 
   put "wine" into sWineCmd
-  put shell(sWineCmd && "--version") into tResult
+  put shell(sWineCmd && "--version 2> /dev/null") into tResult
   put the result into tReturnVal
 
   if tReturnVal is not empty then
     put "/usr/local/bin/wine" into sWineCmd
-    put shell(sWineCmd && "--version") into tResult
+    put shell(sWineCmd && "--version 2> /dev/null") into tResult
     put the result into tReturnVal
   end if
 
