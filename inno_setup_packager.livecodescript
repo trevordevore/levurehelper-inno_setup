@@ -90,7 +90,26 @@ command packagingComplete pBuildProfile, pOutputFolder
       put tSettingsA["wine compiler"] into tCompilerPath
     end if
 
-    if tCompilerPath is empty then return empty
+    if tCompilerPath is empty then
+      put tSettingsA["compiler"] into tCompilerPath
+    end if
+
+    if tCompilerPath is empty then
+      return empty
+    end if
+
+    if there is not a file tCompilerPath then
+      put _findInnoCompilerPath(tSettingsA["compiler"]) into tCompilerPath
+    end if
+
+    if tCompilerPath is empty then
+      return empty
+    end if
+
+    local tFlags
+    if tCompilerPath ends with "Compil32.exe" then
+      put "/cc" into tFlags
+    end if
 
     local tCmd, tResult, tReturnVal
 
@@ -98,18 +117,15 @@ command packagingComplete pBuildProfile, pOutputFolder
       # compil32 /cc "c:\isetup\samples\my script.iss"
       if the platform is "win32" then
         replace "/" with "\" in tScript
-        put format("\"%s\" /cc \"%s\"", tCompilerPath, tScript) into tCmd
+        put format("\"%s\" %s \"%s\"", tCompilerPath, tFlags, tScript) into tCmd
         put shell(tCmd) into tResult
         put the result into tReturnVal
       else
         local tWineFilepath
+        put _winePath(tScript) into tWineFilepath
 
-        put format("\"%s\" -w \"%s\" 2> /dev/null", sWinePathCmd, tScript) into tCmd
-        put line 1 of shell(tCmd) into tWineFilepath
-        put the result into tReturnVal
-
-        if tReturnVal is empty then
-          put format("\"%s\" \"%s\" /cc \"%s\"", sWineCmd, tCompilerPath, tWineFilepath) into tCmd
+        if tWineFilepath is not empty then
+          put format("\"%s\" \"%s\" %s \"%s\"", sWineCmd, tCompilerPath, tFlags, tWineFilepath) into tCmd
           put shell(tCmd) into tResult
           put the result into tReturnVal
         end if
@@ -155,6 +171,56 @@ private function _isWineInstalled
   end if
 end _isWineInstalled
 
+private function _findInnoCompilerPath pCompiler
+  local tPath
+  local tSep
+  if the platform is "win32" then
+    put word 1 to -1 of line 1 of shell("echo %PROGRAMFILES(x86)%") into tPath
+    put "\" into tSep
+  else
+    put word 1 to -1 of line 1 of shell(sWineCmd && "cmd /c 'echo %PROGRAMFILES%' 2> /dev/null") into tPath
+    put "/" into tSep
+    put _winePath(tPath) into tPath
+  end if
+
+  if there is a file (tPath & tSep & pCompiler) then
+    return tPath & tSep & pCompiler
+  end if
+
+  local tFolders
+  put folders(tPath) into tFolders
+  filter tFolders with "Inno Setup*"
+  if tFolders is empty then
+    return empty
+  end if
+
+  sort lines of tFolders descending by the last word of each
+  put tSep & line 1 of tFolders & tSep & pCompiler after tPath
+
+  if there is a file tPath then
+    return tPath
+  else
+    return empty
+  end if
+end _findInnoCompilerPath
+
+private function _winePath pPath
+  local tFlags
+  if pPath contains "/" then
+    put "-w" into tFlags
+  else
+    put "-u" into tFlags
+  end if
+
+  local tCmd
+  put format("\"%s\" %s \"%s\" 2> /dev/null", sWinePathCmd, tFlags, pPath) into tCmd
+  get shell(tCmd)
+  if the result is empty then
+    return word 1 to -1 of line 1 of it
+  else
+    return empty
+  end if
+end _winePath
 
 private command _replaceVariables @xFileData, pBuildProfile
   local tVersion, tConfigA
