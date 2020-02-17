@@ -32,13 +32,13 @@ The first location will be a new configuration setting named `inno setup`. It lo
 inno setup:
   file flags:
   folder flags:
-  executable flags:
+  sign executable files: false
   windows compiler:
   wine compiler:
 ```
 
-The `file flags`, `folder flags`, and `executable flags` properties specify the
-flags that will be added to the file and folder entries in the `.iss` file. The 
+The `file flags` and `folder flags` properties specify the
+flags that will be added to the file and folder entries in the `.iss` file. Set `sign executable files` if you are using `SignTool` in your `.iss` file to sign file. The helper will now find all `.exe` and `.dll` files in your application and, for each one, add a `Source` entry to the `.iss` file with a `sign` flag. The 
 `windows compiler` property is set to the path to Inno Setup `Compil32.exe` or
 `ISCC.exe` compiler. Use `Compil32.exe` to see a the script being compiled in a
 dialog. When running on Windows or when wine is installed the helper will try to
@@ -46,7 +46,7 @@ compile the `.iss` script.
 
 `file flags`: Flags that will be added to all files added to the `.iss` file.
 `folder flags`: Flags that will be added to all folders added to the `.iss` file.
-`executable flags`: Flags that will be added to the executable file that is added to the `.iss` file.
+`sign executable files`: Boolean
 `windows compiler`: Windows path to the Inno Setup `Compil32.exe` file.
 `wine compiler`: Wine path to the Inno Setup `Compil32.exe` file.
 `compiler`: If using the same compiler under both windows or wine then this
@@ -64,7 +64,7 @@ Here is an example using separate full paths to the compilers:
 inno setup:
   file flags: ignoreversion
   folder flags: ignoreversion recursesubdirs createallsubdirs
-  executable flags: ignoreversion sign
+  sign executable files: true
   windows compiler: C:\Program Files (x86)\Inno Setup 5\Compil32.exe
   wine compiler: /Users/myusername/.wine/drive_c/Program Files/Inno Setup 5/Compil32.exe
 ```
@@ -77,7 +77,7 @@ Here is an example specifying a compiler to be found:
 inno setup:
   file flags: ignoreversion
   folder flags: ignoreversion recursesubdirs createallsubdirs
-  executable flags: ignoreversion sign
+  sign executable files: true
   compiler: ISCC.exe
 ```
 
@@ -85,6 +85,7 @@ inno setup:
 # .iss file
 ...
 
+Source: ".\windows\Externals\WinSparkle.dll"; DestDir: "{app}\Externals\WinSparkle.dll"; Flags: sign
 Source: ".\windows\Externals\*"; DestDir: "{app}\Externals"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ".\windows\helpers\*"; DestDir: "{app}\helpers"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: ".\windows\locales\*"; DestDir: "{app}\locales"; Flags: ignoreversion recursesubdirs createallsubdirs

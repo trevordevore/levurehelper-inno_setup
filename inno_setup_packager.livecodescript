@@ -22,6 +22,10 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
     if filesInFolder(pOutputFolder & "/windows/" & tFilename) is empty and foldersInFolder(pOutputFolder & "/windows/" & tFilename) is empty then
       put _q("Name: `{app}\" & tFilename & "`") & cr after tDirFiles
     else
+      if tConfigA["sign executable files"] then
+        _signFilesInFolder pOutputFolder & "/windows/", pOutputFolder & "/windows/" & tFilename, tInstallerFiles
+      end if
+
       put _q("Source: `.\windows\" & tFilename & "\*`; DestDir: `{app}" & "\" & tFilename & "`;") after tInstallerFiles
 
       put _flagsForFilename(tConfigA, tFilename, true) into tFlags
@@ -52,6 +56,40 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
     put pOutputFolder & "/" & pOutputFilename into line (the number of lines of sScriptsToCompile + 1) of sScriptsToCompile
   end if
 end processCopyFilesFile
+
+
+/**
+Summary: Goes through a folder looking for files that need to be signed.
+
+Parameters:
+pRootFolder: The root folder where installer files are located.
+pFolder: The folde to process.
+xOutput: Fill in with Inno Setup syntax for signing files.
+
+Description:
+Signs `.exe`, `.dll`, `.livecode`, and `.livecodescript` files
+
+Returns: nothing
+*/
+private command _signFilesInFolder pRootFolder, pFolder, @xOutput
+  local tSourceFilesFolderName, tFilename, tSrc
+
+  set the itemDelimiter to "/"
+  put the last item of pRootFolder into tSourceFilesFolderName
+
+  repeat for each line tFilename in filesInFolder(pFolder)
+    if tFilename ends with ".exe" or tFilename ends with ".dll" or tFilename then
+      put pFolder & "/" & tFilename into tSrc
+      replace pRootFolder with empty in tSrc
+      replace "/" with "\" in tSrc
+      put _q("Source: `.\" & tSourceFilesFolderName & "\" & tSrc & "`; DestDir: `{app}\" & tSrc & "`; Flags: sign") & cr after xOutput
+    end if
+  end repeat
+
+  repeat for each line tFilename in foldersInFolder(pFolder)
+    _signFilesInFolder pRootFolder, pFolder & "/" & tFilename, xOutput
+  end repeat
+end _signFilesInFolder
 
 
 private function filesInFolder pFolder
@@ -262,10 +300,16 @@ private function _flagsForFilename pConfigA, pFilename, pIsFolder
       put "Flags: " & pConfigA["folder flags"] into tFlags
     end if
   else
-    if pFilename ends with ".exe" and pConfigA["executable flags"] is not empty then
-      put "Flags: " & pConfigA["executable flags"] into tFlags
-    else if pConfigA["file flags"] is not empty then
+    if pConfigA["file flags"] is not empty then
       put "Flags: " & pConfigA["file flags"] into tFlags
+    end if
+
+    if pFilename ends with ".exe" and pConfigA["sign executable files"] then
+      if tFlags is empty then
+        put "Flags:" after tFlags
+      end if
+
+      put " sign" after tFlags
     end if
   end if
 
