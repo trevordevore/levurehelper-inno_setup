@@ -9,8 +9,8 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
 
   put levureAppGet("inno setup") into tConfigA
 
-  put foldersInFolder(pOutputFolder & "/windows") into tFolders
-  put filesInFolder(pOutputFolder & "/windows") into tFiles
+  put _foldersInFolder(pOutputFolder & "/windows") into tFolders
+  put _filesInFolder(pOutputFolder & "/windows") into tFiles
 
   /*
   Examples:
@@ -19,7 +19,7 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
   Source: ".\windows\helpers\*"; DestDir: "{app}\helpers"; Flags: ignoreversion recursesubdirs createallsubdirs
   */
   repeat for each line tFilename in tFolders
-    if filesInFolder(pOutputFolder & "/windows/" & tFilename) is empty and foldersInFolder(pOutputFolder & "/windows/" & tFilename) is empty then
+    if _filesInFolder(pOutputFolder & "/windows/" & tFilename) is empty and _foldersInFolder(pOutputFolder & "/windows/" & tFilename) is empty then
       put _q("Name: `{app}\" & tFilename & "`") & cr after tDirFiles
     else
       if tConfigA["sign executable files"] then
@@ -39,7 +39,7 @@ command processCopyFilesFile pBuildProfile, @xFiledata, pOutputFolder, pOutputFi
   repeat for each line tFilename in tFiles
     put _q("Source: `.\windows\" & tFilename & "`; DestDir: `{app}`;") after tInstallerFiles
 
-    put _flagsForFilename(tConfigA, tFilename, false) into tFlags
+    put _flagsForFilename(tConfigA, pOutputFolder & "/windows/" & tFilename, false) into tFlags
     if tFlags is not empty then
       put space & tFlags after tInstallerFiles
     end if
@@ -77,8 +77,11 @@ private command _signFilesInFolder pRootFolder, pFolder, @xOutput
   set the itemDelimiter to "/"
   put the last item of pRootFolder into tSourceFilesFolderName
 
-  repeat for each line tFilename in filesInFolder(pFolder)
+  repeat for each line tFilename in _filesInFolder(pFolder)
     if tFilename ends with ".exe" or tFilename ends with ".dll" or tFilename then
+      # Fix permissions. LiveCode standalone builder sets permissions to 555 and user can't sign file.
+      _setFilePermissions pFolder & "/" & tFilename, "execute", "read", "read"
+
       put pFolder & "/" & tFilename into tSrc
       replace pRootFolder with empty in tSrc
       replace "/" with "\" in tSrc
@@ -86,29 +89,29 @@ private command _signFilesInFolder pRootFolder, pFolder, @xOutput
     end if
   end repeat
 
-  repeat for each line tFilename in foldersInFolder(pFolder)
+  repeat for each line tFilename in _foldersInFolder(pFolder)
     _signFilesInFolder pRootFolder, pFolder & "/" & tFilename, xOutput
   end repeat
 end _signFilesInFolder
 
 
-private function filesInFolder pFolder
+private function _filesInFolder pFolder
   local tFiles
 
   put files(pFolder) into tFiles
   filter tFiles without ".*"
   return tFiles
-end filesInFolder
+end _filesInFolder
 
 
-private function foldersInFolder pFolder
+private function _foldersInFolder pFolder
   local tFolders
 
   put folders(pFolder) into tFolders
   filter tFolders without ".*"
   filter tFolders without "..*"
   return tFolders
-end foldersInFolder
+end _foldersInFolder
 
 
 command packagingComplete pBuildProfile, pOutputFolder
@@ -304,7 +307,10 @@ private function _flagsForFilename pConfigA, pFilename, pIsFolder
       put "Flags: " & pConfigA["file flags"] into tFlags
     end if
 
-    if pFilename ends with ".exe" and pConfigA["sign executable files"] then
+    if (pFilename ends with ".exe" or pFilename ends with ".dll") and pConfigA["sign executable files"] then
+      # Fix permissions. LiveCode standalone builder sets permissions to 555 and user can't sign file.
+      _setFilePermissions pFilename, "execute", "read", "read"
+
       if tFlags is empty then
         put "Flags:" after tFlags
       end if
@@ -321,3 +327,86 @@ private function _q pStr
   replace "`" with quote in pStr
   return pStr
 end _q
+
+
+private command _setFilePermissions pFile, pOwner, pGroup, pAll
+  local tError, tResult
+
+  put _escapeForShell(pFile) into pFile
+
+  switch the platform
+    case "Win32"
+      /*
+      Displays or changes file attributes.
+      ATTRIB [+R | -R] [+A | -A] [+S | -S] [+H | -H] [[drive:][path]filename]  [/S] [/D]
+
+      + Sets an attribute.
+      - Clears an attribute.
+      R Read-only file attribute.
+      A Archive file attribute.
+      S system file attribute.
+      H Hidden file attribute.
+      /S Processes files in all directories in the specified path.
+      /D Processes folders as well
+      */
+
+      switch pOwner
+        case "read"
+          put "+r" into pOwner
+          break
+        case "write"
+          put "-r" into pOwner
+          break
+      end switch
+      put shell (format ("attrib %s %s", pOwner, pFile) ) into tResult
+      break
+
+    case "MacOS"
+      put _executableBitFromType(pOwner) into pOwner
+      put _executableBitFromType(pGroup) into pGroup
+      put _executableBitFromType(pAll) into pAll
+      put shell(format("chmod %u%u%u %s ", pOwner, pGroup, pAll, pFile)) into tResult
+      break
+  end SWITCH
+
+  if the result is not empty then
+    put line 1 of tResult into tError
+  end if
+
+  return tError
+end _setFilePermissions
+
+
+private function _executableBitFromType pType
+  switch pType
+    case "execute"
+      put 7 into pType
+      break
+    case "write"
+      put 6 into pType
+      break
+    case "read"
+      put 5 into pType
+      break
+    default
+      put 0 into pType
+  end switch
+  return pType
+end _executableBitFromType
+
+
+private function _escapeForShell pStr
+  local tChar, tSpecialChars
+
+  if the platform is "win32" then
+    replace "/" with "\" in pStr
+    put quote & pStr & quote into pStr
+  else
+    put "\" & space & quote & "'`<>!;()[]?#$^&*=|" into tSpecialChars
+    repeat for each char tChar in tSpecialChars
+      replace tChar with ("\" & tChar) in pStr
+    end REPEAT
+  end if
+
+  return pStr
+end _escapeForShell
