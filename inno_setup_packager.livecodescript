@@ -63,11 +63,11 @@ Summary: Goes through a folder looking for files that need to be signed.
 
 Parameters:
 pRootFolder: The root folder where installer files are located.
-pFolder: The folde to process.
+pFolder: The folder to process.
 xOutput: Fill in with Inno Setup syntax for signing files.
 
 Description:
-Signs `.exe`, `.dll`, `.livecode`, and `.livecodescript` files
+Signs `.exe` and `.dll` files.
 
 Returns: nothing
 */
