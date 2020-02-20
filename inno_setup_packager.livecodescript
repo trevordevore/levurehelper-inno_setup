@@ -72,7 +72,7 @@ Signs `.exe`, `.dll`, `.livecode`, and `.livecodescript` files
 Returns: nothing
 */
 private command _signFilesInFolder pRootFolder, pFolder, @xOutput
-  local tSourceFilesFolderName, tFilename, tSrc
+  local tSourceFilesFolderName, tFilename, tSrc, tDestDir
 
   set the itemDelimiter to "/"
   put the last item of pRootFolder into tSourceFilesFolderName
@@ -84,8 +84,15 @@ private command _signFilesInFolder pRootFolder, pFolder, @xOutput
 
       put pFolder & "/" & tFilename into tSrc
       replace pRootFolder with empty in tSrc
+      put tSrc into tDestDir
+      delete the last item of tDestDir # Target the folder, not the file name
+
       replace "/" with "\" in tSrc
-      put _q("Source: `.\" & tSourceFilesFolderName & "\" & tSrc & "`; DestDir: `{app}\" & tSrc & "`; Flags: sign") & cr after xOutput
+      replace "/" with "\" in tDestDir
+
+      if tDestDir is not empty then put "\" before tDestDir
+
+      put _q("Source: `.\" & tSourceFilesFolderName & "\" & tSrc & "`; DestDir: `{app}" & tDestDir & "`; Flags: sign") & cr after xOutput
     end if
   end repeat
 
