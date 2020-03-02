@@ -22,11 +22,12 @@ OutputDir=.\
 
 UsePreviousTasks=Yes
 VersionInfoCompany=MY COMPANY
-VersionInfoCopyright=Copyright (c) 2017 My Company
+VersionInfoCopyright=Copyright (c) 2020 My Company
 VersionInfoDescription=
-VersionInfoProductVersion=
-VersionInfoTextVersion=
-VersionInfoVersion=[[VERSION]]
+VersionInfoProductVersion=[[VERSION]].[[BUILD]]
+VersionInfoProductTextVersion=[[VERSION]].[[BUILD]]
+VersionInfoTextVersion=[[VERSION]].[[BUILD]]
+VersionInfoVersion=[[VERSION]].[[BUILD]]
 ShowLanguageDialog=no
 ChangesAssociations=yes
 
